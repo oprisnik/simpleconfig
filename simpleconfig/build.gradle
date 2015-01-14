@@ -51,9 +51,14 @@ publishing {
 
 bintray {
     def Properties props = new Properties()
-    props.load(new FileInputStream(file("../local.properties")));
-    user = props['bintrayUser']
-    key = props['bintrayApiKey']
+    def File file = file("../local.properties")
+    if (file.exists()) {
+        props.load(new FileInputStream(file))
+        user = props['bintrayUser']
+        key = props['bintrayApiKey']
+    } else {
+        println 'local.properties not found! No bintray user / key set!'
+    }
 
     publications = ['mavenJava']
     //configurations = ['deployables'] //When uploading configuration files
