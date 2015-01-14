@@ -14,47 +14,54 @@ Some examples can be found [here](simpleconfig/src/test).
 
 A very simple XML-Configuration could look like this:
 
-    <config>
-        <text>Hello world!</text>
-        <debug>true</debug>
-    </config>
+```xml
+<config>
+    <text>Hello world!</text>
+    <debug>true</debug>
+</config>
+```
 
-We can then use this configuration in Java:
+We can then use this configuration in Java (see [Config.java](simpleconfig/src/main/java/com/oprisnik/simpleconfig/Config.java)):
 
-    Config config = ConfigFactory.fromFile("my-config.xml");
+```java
+Config config = ConfigFactory.fromFile("my-config.xml");
 
-    String txt = config.getProperty("text"); // will be "Hello world!"
-    boolean debug = config.getBoolean("debug", false); // will be "true"
+String txt = config.getProperty("text"); // will be "Hello world!"
+boolean debug = config.getBoolean("debug", false); // will be "true"
+```
 
 ## Nested Configurations
 
 SimpleConfig also supports nested configurations:
 
-    <config>
-        <user1>
-            <name>Alex</name>
-            <points>123</points>
-        </user1>
+```xml
+<config>
+    <user1>
+        <name>Alex</name>
+        <points>123</points>
+    </user1>
 
-        <user2>
-            <name>Tom</name>
-            <points>10</points>
-        </user2>
-    </config>
-
+    <user2>
+        <name>Tom</name>
+        <points>10</points>
+    </user2>
+</config>
+```
 We can then use this in Java:
 
-    Config config = ConfigFactory.fromFile("my-config.xml");
+```java
+Config config = ConfigFactory.fromFile("my-config.xml");
 
-    // get the configuration for user1
-    Config user1 = config.getSubconfig("user1");
-    String name1 = user1.getProperty("name"); // Alex
-    int points1 = user1.getInt("points", 0); // 123
+// get the configuration for user1
+Config user1 = config.getSubconfig("user1");
+String name1 = user1.getProperty("name"); // Alex
+int points1 = user1.getInt("points", 0); // 123
 
-    // get the configuration for user2
-    Config user2 = config.getSubconfig("user2");
-    String name2 = user1.getProperty("name"); // Tom
-    int points2 = user1.getInt("points", 0); // 10
+// get the configuration for user2
+Config user2 = config.getSubconfig("user2");
+String name2 = user1.getProperty("name"); // Tom
+int points2 = user1.getInt("points", 0); // 10
+```
 
 
 ## Components
@@ -64,45 +71,61 @@ defined in the config file.
 
 For example, consider the following class:
 
-    package com.oprisnik.simpleconfig;
+```java
+package com.oprisnik.simpleconfig;
 
-    public class SimpleComponent implements Configurable {
+public class SimpleComponent implements Configurable {
 
-      public static final String KEY_NAME = "name";
+  public static final String KEY_NAME = "name";
 
-      private String mName = null;
+  private String mName = null;
 
-      @Override
-      public void init(Config config) throws BadConfigException {
-        mName = config.getProperty(KEY_NAME, mName);
-      }
+  @Override
+  public void init(Config config) throws BadConfigException {
+    mName = config.getProperty(KEY_NAME, mName);
+  }
 
-      public String getName() {
-        return mName;
-      }
-    }
+  public String getName() {
+    return mName;
+  }
+}
+```
 
-The `SimpleComponent` implements the `Configurable` interface.
+The `SimpleComponent` implements the [`Configurable`](simpleconfig/src/main/java/com/oprisnik/simpleconfig/Configurable.java) interface.
 Hence it can be configured using our config file:
 
-    <config>
-        <component1 class="com.oprisnik.simpleconfig.SimpleComponent">
-            <name>Alex</name>
-        </component1>
+```xml
+<config>
+    <component1 class="com.oprisnik.simpleconfig.SimpleComponent">
+        <name>Alex</name>
+    </component1>
 
-        <component2 class="com.oprisnik.simpleconfig.SimpleComponent">
-          <name>Tom</name>
-        </component2>
-    </config>
-
+    <component2 class="com.oprisnik.simpleconfig.SimpleComponent">
+      <name>Tom</name>
+    </component2>
+</config>
+```
 
 In Java, we can access it as follows:
 
-    SimpleComponent c1 = config.getComponentAndInit("component1", SimpleComponent.class);
-    String name1 = c1.getName(); // Alex
+```java
+SimpleComponent c1 = config.getComponentAndInit("component1", SimpleComponent.class);
+String name1 = c1.getName(); // Alex
 
-    SimpleComponent c2 = config.getComponentAndInit("component2", SimpleComponent.class);
-    String name2 = c2.getName(); // Tom
+SimpleComponent c2 = config.getComponentAndInit("component2", SimpleComponent.class);
+String name2 = c2.getName(); // Tom
+```
+
+The components do not necessarily need to implement the `Configurable` interface though.
+You can load any class from your configuration file if you want to.
+In this case the component will not be configured, only a new instance will be created using
+the default constructor.
+
+In Java, you can get any component (without initializing it) by calling
+
+```java
+MyClass something = config.getComponent("something", MyClass.class);
+```
 
 ### Default Class Values
 
@@ -111,17 +134,57 @@ If we want to omit this `class` attribute, we can add a default value to our Jav
 
 XML:
 
-    <config>
-        <component1>
-            <name>Alex</name>
-        </component1>
-    </config>
-
+```xml
+<config>
+    <component>
+        <name>Alex</name>
+    </component>
+</config>
+```
 Java:
 
-    SimpleComponent c1 = config.getComponentAndInit("component1",
-                                SimpleComponent.class, SimpleComponent.class);
+```java
+SimpleComponent component = config.getComponentAndInit("component",
+                            SimpleComponent.class, SimpleComponent.class);
 
+String name = component.getName(); // "Alex"
+```
+
+Since we did not specify a `class` attribute for `component1`, the default implementation
+is used.
+
+Suppose we have the following class:
+
+```java
+public class ExtendedComponent extends SimpleComponent {
+
+  @Override
+  public String getName() {
+    return "Extended: " + super.getName();
+  }
+}
+```
+
+Now we can modify the XML configuration file from above:
+```xml
+<config>
+  <component class="com.oprisnik.simpleconfig.ExtendedComponent">
+    <name>Alex</name>
+  </component>
+</config>
+```
+
+And use the same Java code as before:
+
+```java
+SimpleComponent component = config.getComponentAndInit("component",
+SimpleComponent.class, SimpleComponent.class);
+
+String name = component.getName(); // "Extended: Alex"
+```
+
+The name will now be `Extended: Alex` since we have specified a
+`class` attribute in the configuration file and the default value is not used.
 
 ## Copyright
 
