@@ -1,3 +1,7 @@
+# SimpleConfig
+
+[![Build Status](https://travis-ci.org/oprisnik/simpleconfig.svg)](https://travis-ci.org/oprisnik/simpleconfig)
+
 SimpleConfig - Java project configuration the easy way.
 
 With SimpleConfig you can create XML configuration files that can then be easily accessed from code.
