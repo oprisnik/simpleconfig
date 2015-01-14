@@ -33,18 +33,18 @@ dependencies {
 
 
 
-//task sourceJar(type: Jar) {
-//    from sourceSets.main.allJava
-//}
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
             artifactId "simpleconfig"
             from components.java
-//            artifact sourceJar {
-//                classifier "sources"
-//            }
+            artifact sourceJar {
+                classifier "sources"
+            }
         }
     }
 }
