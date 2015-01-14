@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2015 Alexander Oprisnik
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<container>
+
+    <extended1 class="com.oprisnik.simpleconfig.ExtendedComponent">
+        <name>Awesome component</name>
+        <extended>Extended information</extended>
+    </extended1>
+
+    <extended2 class="com.oprisnik.simpleconfig.ExtendedComponent">
+    </extended2>
+
+    <extended3>
+        <name>Awesome name 3</name>
+        <extended>Extended information 3</extended>
+    </extended3>
+
+    <extended4 class="com.oprisnik.simpleconfig.ExtendedComponent">
+        <name>Awesome name 4</name>
+        <extended>Extended information 4</extended>
+    </extended4>
+
+</container>
